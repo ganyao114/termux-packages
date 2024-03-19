@@ -166,7 +166,7 @@ jobs:
               fi
             fi
             cd ./scripts
-            docker build -t ghcr.io/termux/package-builder:latest .
+            docker build -t ghcr.io/ganyao114/package-builder:latest .
             cd ..
           fi
         fi
