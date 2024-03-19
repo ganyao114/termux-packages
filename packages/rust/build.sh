@@ -67,7 +67,7 @@ termux_step_pre_configure() {
 
 	# https://github.com/termux/termux-packages/issues/11427
 	# Fresh build conflict: liblzma -> rust
-	# ld: error: /data/data/com.termux/files/usr/lib/liblzma.a(liblzma_la-common.o) is incompatible with elf64-x86-64
+	# ld: error: /data/data/com.winlator/files/usr/lib/liblzma.a(liblzma_la-common.o) is incompatible with elf64-x86-64
 	mv "${TERMUX_PREFIX}"/lib/liblzma.a{,.tmp} || :
 }
 
