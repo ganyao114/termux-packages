@@ -59,12 +59,12 @@ for pkgname in ${!CGCT[@]}; do
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
 done
 
+ls /data/data/com.termux
+echo "=================================================="
 ls "/data/data/${TERMUX_APP_PACKAGE}"
 echo "=================================================="
-ls "/data/data/${TERMUX_APP_PACKAGE}/com.termux"
 echo "Copy cnct start"
-ls /data/data/com.termux
-mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}/"
+mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux/cgct "/data/data/${TERMUX_APP_PACKAGE}/cgct"
 echo "Copy cnct end"
 ls "/data/data/${TERMUX_APP_PACKAGE}"
 
@@ -76,7 +76,7 @@ if [ ! -d "${CGCT_DIR}/lib" ]; then
 		tar --use-compress-program=unzstd -xf "${TMPDIR_CGCT}/${i}.pkg.zstd" -C "${TMPDIR_CGCT}" usr
 	done
 	echo "${TMPDIR_CGCT}/usr/lib -> ${CGCT_DIR}/lib start"
-	mkdir -p "${CGCT_DIR}/lib" && cp -rf "${TMPDIR_CGCT}/usr/lib/" "${CGCT_DIR}/lib/"
+	mkdir -p "${CGCT_DIR}" && cp -rf "${TMPDIR_CGCT}/usr/lib" "${CGCT_DIR}/lib"
 	echo "${TMPDIR_CGCT}/usr/lib -> ${CGCT_DIR}/lib end"
 fi
 
