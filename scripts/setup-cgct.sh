@@ -77,6 +77,8 @@ fi
 # Setting up CGCT for this glibc
 echo "Setting up CGCT for this glibc..."
 LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
+echo "LD_LIB=${LD_LIB}"
+ls "${LD_LIB}"
 if [ ! -n "$LD_LIB" ]; then
 	echo "Error: interpreter not found in lib directory"
 	exit 1
