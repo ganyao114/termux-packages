@@ -74,6 +74,7 @@ fi
 
 # Setting up CGCT for this glibc
 echo "Setting up CGCT for this glibc..."
+echo "${CGCT_DIR}/lib/"
 ls "${CGCT_DIR}/lib/"
 LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
 if [ ! -n "$LD_LIB" ]; then
