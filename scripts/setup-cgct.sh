@@ -57,9 +57,7 @@ for pkgname in ${!CGCT[@]}; do
 			"$SHA256SUM"
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
-	echo "/data/data/com.termux -> /data/data/${TERMUX_APP_PACKAGE} start"
-  mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
-	echo "/data/data/com.termux -> /data/data/${TERMUX_APP_PACKAGE} end"
+  mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}"
 done
 
 # Installing glibc for CGCT
@@ -78,13 +76,10 @@ fi
 echo "Setting up CGCT for this glibc..."
 ls "${CGCT_DIR}/lib/"
 LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
-echo "LD_LIB=${LD_LIB}"
-ls "${LD_LIB}"
 if [ ! -n "$LD_LIB" ]; then
 	echo "Error: interpreter not found in lib directory"
 	exit 1
 fi
-echo "Setting up CGCT for this glibc 2..."
 for i in aarch64 arm x86_64 i686; do
 	for j in bin lib/gcc; do
 		for f in $(find "${CGCT_DIR}/${i}/${j}" -type f -exec grep -IL . "{}" \; | grep -v -e '\.a' -e '\.o' -e '\.so'); do
@@ -94,4 +89,3 @@ for i in aarch64 arm x86_64 i686; do
 		done
 	done
 done
-echo "Setting up CGCT for this glibc 3..."
