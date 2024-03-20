@@ -58,7 +58,7 @@ for pkgname in ${!CGCT[@]}; do
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
 	echo "Copy CGCT..."
-  cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
+  	cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
 done
 
 # Installing glibc for CGCT
@@ -68,7 +68,10 @@ if [ ! -d "${CGCT_DIR}/lib" ]; then
 		curl -L "https://archlinux.org/packages/core/${ARCH}/${i}/download/" -o "${TMPDIR_CGCT}/${i}.pkg.zstd"
 		tar --use-compress-program=unzstd -xf "${TMPDIR_CGCT}/${i}.pkg.zstd" -C "${TMPDIR_CGCT}" usr
 	done
-	cp -r "${TMPDIR_CGCT}/usr/lib" "${CGCT_DIR}/lib"
+	echo "${TMPDIR_CGCT}/usr/lib -> ${CGCT_DIR}/lib"
+	ls -l "${TMPDIR_CGCT}/usr/lib"
+	ls -l "${CGCT_DIR}/lib"
+	cp -rf "${TMPDIR_CGCT}/usr/lib" "${CGCT_DIR}/lib"
 fi
 
 # Setting up CGCT for this glibc
