@@ -61,7 +61,7 @@ done
 
 echo "Copy cnct start"
 ls /data/data/com.termux/
-cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}/"
+mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}/"
 echo "Copy cnct end"
 ls "/data/data/${TERMUX_APP_PACKAGE}/"
 
