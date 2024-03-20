@@ -58,7 +58,7 @@ for pkgname in ${!CGCT[@]}; do
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
 	echo "Copy CGCT..."
-  	cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
+  	mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
 done
 
 # Installing glibc for CGCT
