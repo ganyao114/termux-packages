@@ -85,7 +85,6 @@ echo "Setting up CGCT for this glibc..."
 echo "${CGCT_DIR}/lib/"
 ls "${CGCT_DIR}/lib/"
 ls "${CGCT_DIR}/"
-ls "${CGCT_DIR}/lib/lib"
 echo "=================================================="
 ls /data/data/com.termux
 echo "=================================================="
