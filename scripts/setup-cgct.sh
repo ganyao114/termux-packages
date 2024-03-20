@@ -68,7 +68,7 @@ if [ ! -d "${CGCT_DIR}/lib" ]; then
 		tar --use-compress-program=unzstd -xf "${TMPDIR_CGCT}/${i}.pkg.zstd" -C "${TMPDIR_CGCT}" usr
 	done
 	echo "${TMPDIR_CGCT}/usr/lib -> ${CGCT_DIR}/lib start"
-	mkdir -p "${CGCT_DIR}/lib" && cp -rf "${TMPDIR_CGCT}/usr/lib" "${CGCT_DIR}/lib"
+	mkdir -p "${CGCT_DIR}/lib" && cp -rf "${TMPDIR_CGCT}/usr/lib/*" "${CGCT_DIR}/lib"
 	echo "${TMPDIR_CGCT}/usr/lib -> ${CGCT_DIR}/lib end"
 fi
 
