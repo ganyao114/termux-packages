@@ -76,6 +76,7 @@ fi
 
 # Setting up CGCT for this glibc
 echo "Setting up CGCT for this glibc..."
+ls "${CGCT_DIR}/lib/"
 LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
 echo "LD_LIB=${LD_LIB}"
 ls "${LD_LIB}"
