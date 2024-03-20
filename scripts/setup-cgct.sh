@@ -57,8 +57,9 @@ for pkgname in ${!CGCT[@]}; do
 			"$SHA256SUM"
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
-	echo "Copy CGCT..."
-  	mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
+	echo "/data/data/com.termux /data/data/${TERMUX_APP_PACKAGE} start"
+  mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux "/data/data/${TERMUX_APP_PACKAGE}"
+	echo "/data/data/com.termux /data/data/${TERMUX_APP_PACKAGE} end"
 done
 
 # Installing glibc for CGCT
@@ -68,7 +69,9 @@ if [ ! -d "${CGCT_DIR}/lib" ]; then
 		curl -L "https://archlinux.org/packages/core/${ARCH}/${i}/download/" -o "${TMPDIR_CGCT}/${i}.pkg.zstd"
 		tar --use-compress-program=unzstd -xf "${TMPDIR_CGCT}/${i}.pkg.zstd" -C "${TMPDIR_CGCT}" usr
 	done
+	echo "${TMPDIR_CGCT}/usr/lib" -> "${CGCT_DIR}/lib start"
 	mkdir -p "${CGCT_DIR}/lib" && cp -rf "${TMPDIR_CGCT}/usr/lib" "${CGCT_DIR}/lib"
+	echo "${TMPDIR_CGCT}/usr/lib" -> "${CGCT_DIR}/lib end"
 fi
 
 # Setting up CGCT for this glibc
@@ -78,6 +81,7 @@ if [ ! -n "$LD_LIB" ]; then
 	echo "Error: interpreter not found in lib directory"
 	exit 1
 fi
+echo "Setting up CGCT for this glibc 2..."
 for i in aarch64 arm x86_64 i686; do
 	for j in bin lib/gcc; do
 		for f in $(find "${CGCT_DIR}/${i}/${j}" -type f -exec grep -IL . "{}" \; | grep -v -e '\.a' -e '\.o' -e '\.so'); do
