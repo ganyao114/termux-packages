@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e -u
 
-CONTAINER=termux-package-builder
+CONTAINER=winemu-package-builder
 IMAGE=ghcr.io/ganyao114/package-builder
 
 docker pull $IMAGE

@@ -4,7 +4,7 @@
 #
 # .\scripts\update-docker.ps1
 
-Set-Variable -Name CONTAINER -Value "termux-package-builder"
+Set-Variable -Name CONTAINER -Value "winemu-package-builder"
 Set-Variable -Name IMAGE -Value "ghcr.io/ganyao114/package-builder"
 
 docker pull $IMAGE
