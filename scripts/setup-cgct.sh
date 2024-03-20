@@ -57,7 +57,7 @@ for pkgname in ${!CGCT[@]}; do
 			"$SHA256SUM"
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
-  mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}"
+  	mkdir -p "/data/data/${TERMUX_APP_PACKAGE}" && cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}"
 done
 
 # Installing glibc for CGCT
@@ -76,6 +76,8 @@ fi
 echo "Setting up CGCT for this glibc..."
 echo "${CGCT_DIR}/lib/"
 ls "${CGCT_DIR}/lib/"
+ls "${CGCT_DIR}/"
+ls "${CGCT_DIR}/lib/lib"
 LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
 if [ ! -n "$LD_LIB" ]; then
 	echo "Error: interpreter not found in lib directory"
