@@ -57,8 +57,9 @@ for pkgname in ${!CGCT[@]}; do
 			"$SHA256SUM"
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
-  cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}/"
 done
+
+cp -rf /data/data/com.termux/ "/data/data/${TERMUX_APP_PACKAGE}/"
 
 # Installing glibc for CGCT
 if [ ! -d "${CGCT_DIR}/lib" ]; then
