@@ -88,9 +88,9 @@ ls "${CGCT_DIR}/"
 echo "=================================================="
 ls /data/data/com.termux
 echo "=================================================="
-ls /data/data/com.winlator
+ls /data/data/com.winemu
 echo "=================================================="
-ls /data/data/com.winlator/cgct
+ls /data/data/com.winemu/cgct
 
 LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
 if [ ! -n "$LD_LIB" ]; then

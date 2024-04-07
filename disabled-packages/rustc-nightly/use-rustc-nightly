@@ -1,2 +1,2 @@
-#!/data/data/com.winlator/files/usr/bin/sh
-export PATH=/data/data/com.winlator/files/usr/opt/rustc-nightly/bin:$PATH
+#!/data/data/com.winemu/files/usr/bin/sh
+export PATH=/data/data/com.winemu/files/usr/opt/rustc-nightly/bin:$PATH
