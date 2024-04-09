@@ -1,0 +1,47 @@
+Index: loader/preloader.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/loader/preloader.c b/loader/preloader.c
+--- a/loader/preloader.c	(revision 7a45d06f8a8d7d07756d9b12ca3ff997c43a3b3e)
++++ b/loader/preloader.c	(date 1711352986562)
+@@ -1447,7 +1447,7 @@
+         {
+             /* don't warn for low 64k */
+             if (preload_info[i].addr >= (void *)0x10000
+-#ifdef __aarch64__
++#if 1
+                 && preload_info[i].addr < (void *)0x7fffffffff /* ARM64 address space might end here*/
+ #endif
+             )
+Index: dlls/ntdll/unix/virtual.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c	(revision 7a45d06f8a8d7d07756d9b12ca3ff997c43a3b3e)
++++ b/dlls/ntdll/unix/virtual.c	(date 1711352986542)
+@@ -163,9 +163,9 @@
+ static void *address_space_start = (void *)0x10000;
+ #endif
+ #ifdef _WIN64
+-static void *address_space_limit = (void *)0x7fffffff0000;  /* top of the total available address space */
+-static void *user_space_limit    = (void *)0x7fffffff0000;  /* top of the user address space */
+-static void *working_set_limit   = (void *)0x7fffffff0000;  /* top of the current working set */
++static void *address_space_limit = (void *)0x7fffff0000;  /* top of the total available address space */
++static void *user_space_limit    = (void *)0x7fffff0000;  /* top of the user address space */
++static void *working_set_limit   = (void *)0x7fffff0000;  /* top of the current working set */
+ #else
+ static void *address_space_limit = (void *)0xc0000000;
+ static void *user_space_limit    = (void *)0x7fff0000;
+@@ -552,7 +552,7 @@
+     /* if we don't have a preloader, try to reserve the space now */
+     reserve_area( (void *)0x000000010000, (void *)0x000068000000 );
+     reserve_area( (void *)0x00007f000000, (void *)0x00007fff0000 );
+-    reserve_area( (void *)0x7ffffe000000, (void *)0x7fffffff0000 );
++    reserve_area( (void *)0x7ffe000000, (void *)0x7fffff0000 );
+ 
+ #endif
+ }
