@@ -9,9 +9,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.5
 TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/9.x/wine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=12cf2fb7098134e2351c49ea3ba8f4da2a674f1f8722bebd4c3a4a6ca6d2e975
-TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, vulkan-loader, libandroid-shmem"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
-TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
@@ -48,7 +48,7 @@ enable_wineandroid_drv=no
 --with-pthread
 --with-pulse
 --without-sane
---with-sdl
+--without-sdl
 --without-udev
 --without-unwind
 --without-usb
@@ -60,10 +60,10 @@ enable_wineandroid_drv=no
 --without-xinerama
 --with-xinput
 --with-xinput2
---with-xrandr
+--without-xrandr
 --with-xrender
 --without-xshape
---without-xshm
+--with-xshm
 --without-xxf86vm
 "
 
@@ -121,6 +121,7 @@ termux_step_pre_configure() {
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
 	LDFLAGS+=" -landroid-spawn"
+  LDFLAGS+=" -Wl,--as-needed -landroid-shmem"
 
 	export XPERIMENTAL_WOW64="${EXPERIMENTAL_WOW64:-true}"
 }
