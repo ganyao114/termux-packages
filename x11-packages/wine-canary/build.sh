@@ -7,8 +7,8 @@ LICENSE.OLD
 COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.4
-TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/9.x/wine-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=c55ff9957612549b8c7df7cddc79d7a00d19157d05b371148bf08d4ddf768ec6
+TERMUX_PKG_SRCURL=https://github.com/ganyao114/wine-staging/raw/main/wine-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=7fb584357a6959d59a31c4e745d618a4a82c0c8e16a944cf5b1c1851ec1ffc9d
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, vulkan-loader, libandroid-shmem"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
