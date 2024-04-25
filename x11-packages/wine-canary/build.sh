@@ -8,7 +8,7 @@ COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.4
 TERMUX_PKG_SRCURL=https://github.com/ganyao114/wine-staging/raw/main/wine-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=a9a274be2b4019b92b04fad37df17b47808f621aad848277b5681dba327d4f83
+TERMUX_PKG_SHA256=ad369db63efcb855293a88f699dccba6ac83b079742229dd64d8972ffef63f59
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, vulkan-loader, libandroid-shmem"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
@@ -24,7 +24,7 @@ enable_wineandroid_drv=no
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
 --enable-nls
 --disable-tests
---without-alsa
+--with-alsa
 --without-capi
 --without-coreaudio
 --without-cups
@@ -46,7 +46,6 @@ enable_wineandroid_drv=no
 --without-oss
 --without-pcap
 --with-pthread
---with-pulse
 --without-sane
 --without-sdl
 --without-udev
