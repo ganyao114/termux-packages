@@ -110,7 +110,12 @@ termux_step_pre_configure() {
 	_setup_llvm_mingw_toolchain
 
 	# Copy dll patches
-  cp -rf $TERMUX_PKG_BUILDER_DIR/dlls/xinput/ $TERMUX_PKG_SRCDIR/dlls/xinput1_3/
+  cp -f $TERMUX_PKG_BUILDER_DIR/dlls/xinput/main.c $TERMUX_PKG_SRCDIR/dlls/xinput1_3/main.c
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_1/Makefile.in
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_2/Makefile.in
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_3/Makefile.in
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_4/Makefile.in
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput9_1_0/Makefile.in
 
 	# Fix overoptimization
 	CPPFLAGS="${CPPFLAGS/-Oz/}"
