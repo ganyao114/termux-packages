@@ -111,11 +111,11 @@ termux_step_pre_configure() {
 
 	# Copy dll patches
   cp -f $TERMUX_PKG_BUILDER_DIR/dlls/xinput/main.c $TERMUX_PKG_SRCDIR/dlls/xinput1_3/main.c
-  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_1/Makefile.in
-  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_2/Makefile.in
-  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_3/Makefile.in
-  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_4/Makefile.in
-  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput9_1_0/Makefile.in
+#  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_1/Makefile.in
+#  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_2/Makefile.in
+#  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_3/Makefile.in
+#  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_4/Makefile.in
+#  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput9_1_0/Makefile.in
 
 	# Fix overoptimization
 	CPPFLAGS="${CPPFLAGS/-Oz/}"
@@ -132,6 +132,33 @@ termux_step_pre_configure() {
   LDFLAGS+=" -Wl,--as-needed -landroid-shmem"
 
 	export XPERIMENTAL_WOW64="${EXPERIMENTAL_WOW64:-true}"
+}
+
+termux_step_post_configure() {
+  makefile_path="$TERMUX_PKG_SRCDIR/../build/Makefile"
+
+  if [ -f "$makefile_path" ]; then
+      echo "Load Makefile"
+      filedata=$(<"$makefile_path")
+      echo "rescue libwsock32.a"
+      filedata=$(echo "$filedata" | sed 's/rm -f dlls\/wsock32\/libwsock32.a dlls\/wsock32\/x86_64-windows\/libwsock32.a dlls\/wsock32\/version.res \\/rm -f dlls\/wsock32\/libwsock32.a dlls\/wsock32\/version.res \\/')
+      echo "put libwsock32.a to xinput1_1.dll"
+      filedata=$(echo "$filedata" | sed 's/dlls\/xinput1_1\/version.res dlls\/hid\/x86_64-windows\/libhid.a \\/dlls\/xinput1_1\/version.res dlls\/hid\/x86_64-windows\/libhid.a dlls\/wsock32\/x86_64-windows\/libwsock32.a \\/')
+      echo "put libwsock32.a to xinput1_2.dll"
+      filedata=$(echo "$filedata" | sed 's/dlls\/xinput1_2\/version.res dlls\/hid\/x86_64-windows\/libhid.a \\/dlls\/xinput1_2\/version.res dlls\/hid\/x86_64-windows\/libhid.a dlls\/wsock32\/x86_64-windows\/libwsock32.a \\/')
+      echo "put libwsock32.a to xinput1_3.dll"
+      filedata=$(echo "$filedata" | sed 's/dlls\/xinput1_3\/version.res dlls\/hid\/x86_64-windows\/libhid.a \\/dlls\/xinput1_3\/version.res dlls\/hid\/x86_64-windows\/libhid.a dlls\/wsock32\/x86_64-windows\/libwsock32.a \\/')
+      echo "put libwsock32.a to xinput1_4.dll"
+      filedata=$(echo "$filedata" | sed 's/dlls\/xinput1_4\/version.res dlls\/hid\/x86_64-windows\/libhid.a \\/dlls\/xinput1_4\/version.res dlls\/hid\/x86_64-windows\/libhid.a dlls\/wsock32\/x86_64-windows\/libwsock32.a \\/')
+      echo "put libwsock32.a to xinput9_1_0.dll"
+      filedata=$(echo "$filedata" | sed 's/dlls\/advapi32\/x86_64-windows\/libadvapi32\.a dlls\/user32\/x86_64-windows\/libuser32\.a/dlls\/advapi32\/x86_64-windows\/libadvapi32\.a dlls\/user32\/x86_64-windows\/libuser32\.a dlls\/wsock32\/x86_64-windows\/libwsock32.a/')
+      echo "Save Makefile"
+      echo "$filedata" > "$makefile_path"
+      echo "done"
+  else
+      echo "'$makefile_path' not found"
+      exit
+  fi
 }
 
 termux_step_make_install() {
