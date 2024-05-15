@@ -109,6 +109,9 @@ termux_step_pre_configure() {
 	# Setup llvm-mingw toolchain
 	_setup_llvm_mingw_toolchain
 
+	# Copy dll patches
+  cp -rf $TERMUX_PKG_BUILDER_DIR/dlls/xinput/ $TERMUX_PKG_SRCDIR/wine-$TERMUX_PKG_VERSION/dlls/xinput1_3/
+
 	# Fix overoptimization
 	CPPFLAGS="${CPPFLAGS/-Oz/}"
 	CFLAGS="${CFLAGS/-Oz/}"
