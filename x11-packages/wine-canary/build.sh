@@ -9,7 +9,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.4
 TERMUX_PKG_SRCURL=https://github.com/ganyao114/wine-staging/raw/main/wine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=ad369db63efcb855293a88f699dccba6ac83b079742229dd64d8972ffef63f59
-TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, vulkan-loader, libandroid-shmem, alsa-lib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, vulkan-loader, libandroid-shmem, alsa-lib, gstreamer, gst-plugins-base"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -36,7 +36,7 @@ wine_cv_have_sched_setaffinity=no
 --with-gettextpo=no
 --without-gphoto
 --with-gnutls
---without-gstreamer
+--with-gstreamer
 --without-inotify
 --with-krb5
 --with-mingw
@@ -100,6 +100,8 @@ termux_step_host_build() {
 	# Setup llvm-mingw toolchain
 	_setup_llvm_mingw_toolchain
 
+	# Patch xinput
+  cp -f $TERMUX_PKG_BUILDER_DIR/dlls/xinput/main.c $TERMUX_PKG_SRCDIR/dlls/xinput1_3/main.c
   sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_1/Makefile.in
   sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_2/Makefile.in
   sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput1_3/Makefile.in
@@ -115,9 +117,6 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# Setup llvm-mingw toolchain
 	_setup_llvm_mingw_toolchain
-
-	# Copy dll patches
-  cp -f $TERMUX_PKG_BUILDER_DIR/dlls/xinput/main.c $TERMUX_PKG_SRCDIR/dlls/xinput1_3/main.c
 
 	# Fix overoptimization
 	CPPFLAGS="${CPPFLAGS/-Oz/}"
