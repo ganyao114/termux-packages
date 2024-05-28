@@ -106,8 +106,8 @@ termux_step_host_build() {
 	./wine-staging/staging/patchinstall.py DESTDIR="$TERMUX_PKG_SRCDIR" eventfd_synchronization
   # esync patch 2
   cp -f $TERMUX_PKG_BUILDER_DIR/shm_patch.h $TERMUX_PKG_SRCDIR/shm_patch.h
-  sed -i '1i #include "../shm_patch.h"' $TERMUX_PKG_SRCDIR/server/esync.c
-  sed -i '1i #include "../../../shm_patch.h"' $TERMUX_PKG_SRCDIR/dlls/ntdll/unix/esync.c
+  sed -i '/#include "config.h"/a #include "../shm_patch.h"' $TERMUX_PKG_SRCDIR/server/esync.c
+  sed -i '/#include "config.h"/a #include "../../../shm_patch.h"' $TERMUX_PKG_SRCDIR/dlls/ntdll/unix/esync.c
 
 	# Patch xinput
   cp -f $TERMUX_PKG_BUILDER_DIR/dlls/xinput/main.c $TERMUX_PKG_SRCDIR/dlls/xinput1_3/main.c
