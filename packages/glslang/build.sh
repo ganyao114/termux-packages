@@ -10,9 +10,19 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_DEPENDS="spirv-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DALLOW_EXTERNAL_SPIRV_TOOLS=ON
 "
+
+termux_step_host_build() {
+	termux_setup_cmake
+	cd $TERMUX_PKG_SRCDIR/
+	./update_glslang_sources.py
+	cd $TERMUX_PKG_HOSTBUILD_DIR
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/install" $TERMUX_PKG_SRCDIR
+	make -j$TERMUX_MAKE_PROCESSES
+}
 
 termux_step_post_make_install() {
 	# build system only build static or shared at a time
