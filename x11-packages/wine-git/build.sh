@@ -118,6 +118,13 @@ termux_step_host_build() {
   sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinput9_1_0/Makefile.in
   sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/xinputuap/Makefile.in
 
+  # Patch dinput
+  cp -f $TERMUX_PKG_BUILDER_DIR/dlls/dinput/gamepad.c $TERMUX_PKG_SRCDIR/dlls/dinput/gamepad.c
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/dinput/Makefile.in
+  sed -i '/SOURCES = \\/a   gamepad.c \\' $TERMUX_PKG_SRCDIR/dlls/dinput/Makefile.in
+  sed -i '/^IMPORTS/ s/$/ ws2_32/' $TERMUX_PKG_SRCDIR/dlls/dinput8/Makefile.in
+  sed -i '/SOURCES = \\/a   gamepad.c \\' $TERMUX_PKG_SRCDIR/dlls/dinput8/Makefile.in
+
 	# Make host wine-tools
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -j "$TERMUX_MAKE_PROCESSES" __tooldeps__ nls/all
