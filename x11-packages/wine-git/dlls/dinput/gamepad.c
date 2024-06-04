@@ -418,7 +418,6 @@ static void release_gamepad_request( void )
 
 HRESULT gamepad_enum_device( DWORD type, DWORD flags, DIDEVICEINSTANCEW *instance, DWORD version )
 {    
-    if (!create_server_socket()) return DIERR_INPUTLOST;
     return get_gamepad_request( instance, version ) ? DI_OK : DIERR_INPUTLOST;
 }
 
