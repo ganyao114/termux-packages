@@ -466,8 +466,7 @@ HRESULT gamepad_create_device( struct dinput *dinput, const GUID *guid, IDirectI
 
     if (dinput->dwVersion >= 0x0800)
     {
-        impl->base.raw_device.usUsagePage = HID_USAGE_PAGE_GENERIC;
-        impl->base.raw_device.usUsage = HID_USAGE_GENERIC_GAMEPAD;
+        impl->base.use_raw_input = TRUE;
     }
 
     *out = &impl->base.IDirectInputDevice8W_iface;
@@ -505,21 +504,21 @@ static HRESULT gamepad_unacquire( IDirectInputDevice8W *iface )
     return DI_OK;
 }
 
-static BOOL try_enum_object( const DIPROPHEADER *filter, DWORD flags, LPDIENUMDEVICEOBJECTSCALLBACKW callback,
-                             DIDEVICEOBJECTINSTANCEW *instance, void *data )
+static BOOL try_enum_object( struct dinput_device *impl, const DIPROPHEADER *filter, DWORD flags, enum_object_callback callback,
+                             UINT index, DIDEVICEOBJECTINSTANCEW *instance, void *data )
 {
     if (flags != DIDFT_ALL && !(flags & DIDFT_GETTYPE( instance->dwType ))) return DIENUM_CONTINUE;
 
     switch (filter->dwHow)
     {
     case DIPH_DEVICE:
-        return callback( instance, data );
+        return callback( impl, index, NULL, instance, data );
     case DIPH_BYOFFSET:
         if (filter->dwObj != instance->dwOfs) return DIENUM_CONTINUE;
-        return callback( instance, data );
+        return callback( impl, index, NULL, instance, data );
     case DIPH_BYID:
         if ((filter->dwObj & 0x00ffffff) != (instance->dwType & 0x00ffffff)) return DIENUM_CONTINUE;
-        return callback( instance, data );
+        return callback( impl, index, NULL, instance, data );
     }
 
     return DIENUM_CONTINUE;
@@ -666,7 +665,7 @@ static void get_device_objects( int *instance_count, DIDEVICEOBJECTINSTANCEW **o
 }
 
 static HRESULT gamepad_enum_objects( IDirectInputDevice8W *iface, const DIPROPHEADER *filter,
-                                     DWORD flags, LPDIENUMDEVICEOBJECTSCALLBACKW callback, void *context )
+                                     DWORD flags, enum_object_callback callback, void *context )
 {    
     int instance_count;
     DIDEVICEOBJECTINSTANCEW* instances;
@@ -675,12 +674,14 @@ static HRESULT gamepad_enum_objects( IDirectInputDevice8W *iface, const DIPROPHE
     
     get_device_objects( &instance_count, &instances );
 
+    struct gamepad *impl = impl_from_IDirectInputDevice8W( iface );
+
     for (i = 0; i < instance_count; i++)
     {
         instances[i].dwSize = sizeof(DIDEVICEOBJECTINSTANCEW);
         instances[i].wReportId = 1;
         
-        ret = try_enum_object( filter, flags, callback, instances + i, context );
+        ret = try_enum_object( &impl->base, filter, flags, callback, i, instances + i, context );
         if (ret != DIENUM_CONTINUE) return DIENUM_STOP;
     }
 

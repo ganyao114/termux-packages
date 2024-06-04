@@ -1,5 +1,23 @@
-Subject: [PATCH] dinput
+Subject: [PATCH] 0008-dinput
 ---
+Index: dlls/dinput/dinput_private.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/dlls/dinput/dinput_private.h b/dlls/dinput/dinput_private.h
+--- a/dlls/dinput/dinput_private.h	(revision 675959b3a58df18c21fb918e7961f509827a035e)
++++ b/dlls/dinput/dinput_private.h	(date 1717507289278)
+@@ -57,6 +57,9 @@
+ extern HRESULT hid_joystick_enum_device( DWORD type, DWORD flags, DIDEVICEINSTANCEW *instance, DWORD version, int index );
+ extern HRESULT hid_joystick_create_device( struct dinput *dinput, const GUID *guid, IDirectInputDevice8W **out );
+ 
++extern HRESULT gamepad_enum_device( DWORD type, DWORD flags, DIDEVICEINSTANCEW *instance, DWORD version );
++extern HRESULT gamepad_create_device( struct dinput *dinput, const GUID *guid, IDirectInputDevice8W **out );
++
+ struct DevicePlayer {
+     GUID instance_guid;
+     WCHAR username[MAX_PATH];
 Index: dlls/dinput/dinput.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
