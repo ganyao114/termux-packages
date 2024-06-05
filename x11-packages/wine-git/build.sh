@@ -148,7 +148,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-spawn"
   LDFLAGS+=" -Wl,--as-needed -landroid-shmem"
 
-	export XPERIMENTAL_WOW64="${EXPERIMENTAL_WOW64:-true}"
+	export EXPERIMENTAL_WOW64="${EXPERIMENTAL_WOW64:-true}"
 }
 
 termux_step_make_install() {
