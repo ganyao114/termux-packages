@@ -248,6 +248,7 @@ static void controller_init(void)
     controller.connected = TRUE;
     controller_check_caps();
     controller_enable();
+    SetEvent(start_event);
 }
 
 static void controller_check_connection(void)
@@ -354,7 +355,6 @@ static DWORD WINAPI controller_update_thread_proc(void *param)
     DWORD ret = WAIT_TIMEOUT;
 
     SetThreadDescription(GetCurrentThread(), L"wine_xinput_controller_update");
-    SetEvent(start_event);
 
     last_time = GetCurrentTime();
     do
