@@ -225,6 +225,7 @@ static void controller_init(void)
     controller.connected = TRUE;
     controller_check_caps();
     controller_enable();
+    SetEvent(start_event);
 }
 
 static void controller_check_connection(void)
@@ -242,7 +243,6 @@ static void controller_check_connection(void)
             controller_init();
         }
     }
-    SetEvent(start_event);
 }
 
 static void stop_update_thread(void)
