@@ -5,7 +5,6 @@
  * Copyright 2021 Rémi Bernon for CodeWeavers
  * Copyright 2024 BrunoSX 
  *
- *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -19,8 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
- *
- *
  */
 
 #include <assert.h>
@@ -44,12 +41,9 @@
 #include "devguid.h"
 #include "xinput.h"
 
-#include <stdio.h> 
-#include <stdarg.h>
-
 #include "wine/debug.h"
 
-
+/* Not defined in the headers, used only by XInputGetStateEx */
 #define XINPUT_GAMEPAD_GUIDE 0x0400
 
 #define SERVER_PORT 7949
@@ -97,38 +91,9 @@ static HANDLE stop_event;
 static HANDLE done_event;
 static HANDLE update_event;
 
-static BOOL is_running = TRUE;
-static BOOL console_debug = FALSE;
 static SOCKET server_sock = INVALID_SOCKET;
 static BOOL winsock_loaded = FALSE;
 static char xinput_min_index = 3;
-
-char buffer[BUFFER_SIZE];
-int res;
-int client_addr_len;
-struct sockaddr_in client_addr;
-
-void int_to_string(int num, char* str) {
-    sprintf(str, "%d", num);
-}
-
-void console_write(const char *message) {
-    if(!console_debug) return;
-    char timestamp[9]; 
-    SYSTEMTIME sysTime;
-    GetLocalTime(&sysTime);
-    sprintf_s(timestamp, sizeof(timestamp), "%02d:%02d:%02d", sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
-
-    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (consoleHandle != INVALID_HANDLE_VALUE) {
-        DWORD bytesWritten;
-        WriteConsoleA(consoleHandle, timestamp, strlen(timestamp), &bytesWritten, NULL);
-        WriteConsoleA(consoleHandle, " > ", 3, &bytesWritten, NULL);
-        WriteConsoleA(consoleHandle, message, strlen(message), &bytesWritten, NULL);
-        WriteConsoleA(consoleHandle, "\n", 1, &bytesWritten, NULL);
-    }
-} 
-
 
 static void close_server_socket(void) 
 {
@@ -137,6 +102,7 @@ static void close_server_socket(void)
         closesocket(server_sock);
         server_sock = INVALID_SOCKET;
     }
+    
     if (winsock_loaded) 
     {
         WSACleanup();
@@ -145,54 +111,65 @@ static void close_server_socket(void)
 }
 
 static BOOL create_server_socket(void)
-{
-   if(is_running){
-        WSADATA wsa_data;
-        struct sockaddr_in server_addr;
-        int res;
+{    
+    WSADATA wsa_data;
+    struct sockaddr_in server_addr;
+    int res;
+    
+    close_server_socket();
+    
+    winsock_loaded = WSAStartup(MAKEWORD(2,2), &wsa_data) == NO_ERROR;
+    if (!winsock_loaded) return FALSE;
+    
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_addr.sin_port = htons(SERVER_PORT);
+    
+    server_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (server_sock == INVALID_SOCKET) return FALSE;
 
-        close_server_socket();
-
-        winsock_loaded = WSAStartup(MAKEWORD(2,2), &wsa_data) == NO_ERROR;
-        if (!winsock_loaded) return FALSE;
-
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        server_addr.sin_port = htons(SERVER_PORT);
-
-        server_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-        if (server_sock == INVALID_SOCKET) return FALSE;
-
-        res = bind(server_sock, (struct sockaddr*)&server_addr, sizeof(server_addr));
-        if (res == SOCKET_ERROR) return FALSE;
-
-    }
-    is_running = FALSE;
+    res = bind(server_sock, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    if (res == SOCKET_ERROR) return FALSE;
+    
     return TRUE;
 }
 
 static int get_gamepad_request(void)
 {
-    if(is_running) return 3;
-        return 0;
-}
-
-static void release_gamepad_request(void)
-{
-    /*
+    int res, client_addr_len, gamepad_id;
     char buffer[BUFFER_SIZE];
     struct sockaddr_in client_addr;
-    int client_addr_len;
-
+    
     client_addr.sin_family = AF_INET;
     client_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     client_addr.sin_port = htons(CLIENT_PORT);
     client_addr_len = sizeof(client_addr);
+    
+    buffer[0] = REQUEST_CODE_GET_GAMEPAD;
+    buffer[1] = 1;
+    res = sendto(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, client_addr_len);
+    if (res == SOCKET_ERROR) return 0;
+    
+    res = recvfrom(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &client_addr_len);
+    if (res == SOCKET_ERROR || buffer[0] != REQUEST_CODE_GET_GAMEPAD) return 0;
+    
+    memcpy(&gamepad_id, buffer + 1, 4);
+    return gamepad_id;
+}
 
+static void release_gamepad_request(void)
+{
+    char buffer[BUFFER_SIZE];
+    struct sockaddr_in client_addr;
+    int client_addr_len;
+    
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    client_addr.sin_port = htons(CLIENT_PORT);
+    client_addr_len = sizeof(client_addr);
+    
     buffer[0] = REQUEST_CODE_RELEASE_GAMEPAD;
     sendto(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, client_addr_len);
-    Removed, i think not need
-    */
 }
 
 static BOOL controller_check_caps(void)
@@ -248,7 +225,6 @@ static void controller_init(void)
     controller.connected = TRUE;
     controller_check_caps();
     controller_enable();
-    SetEvent(start_event);
 }
 
 static void controller_check_connection(void)
@@ -266,6 +242,7 @@ static void controller_check_connection(void)
             controller_init();
         }
     }
+    SetEvent(start_event);
 }
 
 static void stop_update_thread(void)
@@ -284,47 +261,61 @@ static void stop_update_thread(void)
 
 static void read_controller_state(void)
 {
+    char buffer[BUFFER_SIZE];
+    int i, res, client_addr_len, gamepad_id;
+    char dpad;
+    short buttons, thumb_lx, thumb_ly, thumb_rx, thumb_ry;
+    struct sockaddr_in client_addr;
+    XINPUT_STATE state;
+    
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    client_addr.sin_port = htons(CLIENT_PORT);
+    client_addr_len = sizeof(client_addr);
 
     buffer[0] = REQUEST_CODE_GET_GAMEPAD_STATE;
-    *(int*)(buffer + 1) = controller.id; // Directly write integer to buffer
+    memcpy(buffer + 1, &controller.id, 4);
     
-    res = sendto(server_sock, buffer, sizeof(int) + 1, 0, (struct sockaddr*)&client_addr, client_addr_len);
+    res = sendto(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, client_addr_len);
     if (res == SOCKET_ERROR) return;
     
     res = recvfrom(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &client_addr_len);
     if (res == SOCKET_ERROR || buffer[0] != REQUEST_CODE_GET_GAMEPAD_STATE || buffer[1] != 1) return;
+    
+    memcpy(&gamepad_id, buffer + 2, 4);
+    if (gamepad_id != controller.id) return;
+    
+    memcpy(&buttons, buffer + 6, 2);
+    
+    dpad = buffer[8];
+    
+    memcpy(&thumb_lx, buffer + 9, 2);
+    memcpy(&thumb_ly, buffer + 11, 2);
+    memcpy(&thumb_rx, buffer + 13, 2);
+    memcpy(&thumb_ry, buffer + 15, 2);    
 
-    XINPUT_STATE state;
-    memset(&state, 0, sizeof(XINPUT_STATE)); // Initialize state
-
-    int buttons = *(short*)(buffer + 6); // Directly read short from buffer
-    char dpad = buffer[8];
-    short thumb_lx = *(short*)(buffer + 9);
-    short thumb_ly = *(short*)(buffer + 11);
-    short thumb_rx = *(short*)(buffer + 13);
-    short thumb_ry = *(short*)(buffer + 15);
-
-    for (int i = 0; i < 10; i++)
+    state.Gamepad.wButtons = 0;
+    for (i = 0; i < 10; i++)
     {    
-        if (buttons & (1 << i)) {
+        if ((buttons & (1<<i))) {
             switch (i)
             {
-                case IDX_BUTTON_A: state.Gamepad.wButtons |= XINPUT_GAMEPAD_A; break;
-                case IDX_BUTTON_B: state.Gamepad.wButtons |= XINPUT_GAMEPAD_B; break;
-                case IDX_BUTTON_X: state.Gamepad.wButtons |= XINPUT_GAMEPAD_X; break;
-                case IDX_BUTTON_Y: state.Gamepad.wButtons |= XINPUT_GAMEPAD_Y; break;
-                case IDX_BUTTON_L1: state.Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_SHOULDER; break;
-                case IDX_BUTTON_R1: state.Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_SHOULDER; break;
-                case IDX_BUTTON_SELECT: state.Gamepad.wButtons |= XINPUT_GAMEPAD_BACK; break;
-                case IDX_BUTTON_START: state.Gamepad.wButtons |= XINPUT_GAMEPAD_START; break;
-                case IDX_BUTTON_L3: state.Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_THUMB; break;
-                case IDX_BUTTON_R3: state.Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_THUMB; break;
+            case IDX_BUTTON_A: state.Gamepad.wButtons |= XINPUT_GAMEPAD_A; break;
+            case IDX_BUTTON_B: state.Gamepad.wButtons |= XINPUT_GAMEPAD_B; break;
+            case IDX_BUTTON_X: state.Gamepad.wButtons |= XINPUT_GAMEPAD_X; break;
+            case IDX_BUTTON_Y: state.Gamepad.wButtons |= XINPUT_GAMEPAD_Y; break;
+            case IDX_BUTTON_L1: state.Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_SHOULDER; break;
+            case IDX_BUTTON_R1: state.Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_SHOULDER; break;
+            case IDX_BUTTON_SELECT: state.Gamepad.wButtons |= XINPUT_GAMEPAD_BACK; break;
+            case IDX_BUTTON_START: state.Gamepad.wButtons |= XINPUT_GAMEPAD_START; break;
+            case IDX_BUTTON_L3: state.Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_THUMB; break;
+            case IDX_BUTTON_R3: state.Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_THUMB; break;
             }
         }
     }
     
-    state.Gamepad.bLeftTrigger = (buttons & (1 << 10)) ? 255 : 0;
-    state.Gamepad.bRightTrigger = (buttons & (1 << 11)) ? 255 : 0;
+    state.Gamepad.bLeftTrigger = (buttons & (1<<10)) ? 255 : 0;
+    state.Gamepad.bRightTrigger = (buttons & (1<<11)) ? 255 : 0;
 
     switch (dpad)
     {
@@ -366,8 +357,8 @@ static DWORD WINAPI controller_update_thread_proc(void *param)
         }
         if (controller.connected && controller.enabled) 
         {
-            is_running = TRUE;
-            Sleep(500);
+            read_controller_state();
+            Sleep(16);
         }
         
         events[0] = update_event;
@@ -383,13 +374,6 @@ static DWORD WINAPI controller_update_thread_proc(void *param)
 
 static BOOL WINAPI start_update_thread_once(INIT_ONCE *once, void *param, void **context)
 {
-    if(console_debug) AllocConsole();
-
-    client_addr.sin_family = AF_INET;
-    client_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    client_addr.sin_port = htons(CLIENT_PORT);
-    client_addr_len = sizeof(client_addr);
-
     HANDLE thread;
 
     start_event = CreateEventA(NULL, FALSE, FALSE, NULL);
@@ -475,10 +459,6 @@ static DWORD xinput_get_state(DWORD index, XINPUT_STATE *state)
     if (!state) return ERROR_BAD_ARGUMENTS;
 
     start_update_thread();
-    if (controller.connected && controller.enabled && is_running)
-    {
-        read_controller_state();
-    }
 
     if (index >= XUSER_MAX_COUNT) return ERROR_BAD_ARGUMENTS;
     if (index < xinput_min_index) xinput_min_index = index;
